@@ -6,8 +6,21 @@ export default function Task({ task, onEdit, onDelete }) {
   const [editedDescription, setEditedDescription] = useState(task.description);
 
   const handleSave = () => {
+    // Pass the updated task details and close the editing mode
     onEdit({ ...task, title: editedTitle, description: editedDescription });
     setIsEditing(false);
+  };
+
+  const handleDelete = (e) => {
+    // Prevent click on the Edit button from triggering the delete
+    e.stopPropagation();
+    onDelete(task.id); // Delete the task
+  };
+
+  const handleEditClick = (e) => {
+    // Prevent the delete action from being triggered
+    e.stopPropagation();
+    setIsEditing(true);
   };
 
   return (
@@ -28,8 +41,15 @@ export default function Task({ task, onEdit, onDelete }) {
             placeholder="Edit description"
           />
           <div className="mt-2 flex space-x-2">
-            <button onClick={handleSave} className="text-green-500">Save</button>
-            <button onClick={() => setIsEditing(false)} className="text-gray-500">Cancel</button>
+            <button onClick={handleSave} className="text-green-500">
+              Save
+            </button>
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-gray-500"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       ) : (
@@ -37,8 +57,15 @@ export default function Task({ task, onEdit, onDelete }) {
           <h3 className="text-lg font-bold">{task.title}</h3>
           <p className="text-sm">{task.description}</p>
           <div className="mt-2 flex space-x-2">
-            <button onClick={() => setIsEditing(true)} className="text-blue-500">Edit</button>
-            <button onClick={onDelete} className="text-red-500">Delete</button>
+            <button
+              onClick={handleEditClick}
+              className="text-blue-500"
+            >
+              Edit
+            </button>
+            <button onClick={handleDelete} className="text-red-500">
+              Delete
+            </button>
           </div>
         </div>
       )}

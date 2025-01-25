@@ -7,6 +7,7 @@ export default function Column({
   onDeleteColumn,
   onTaskUpdate,
   onRenameColumn,
+  onDelete,
 }) {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
@@ -14,7 +15,7 @@ export default function Column({
 
   const handleAddTask = () => {
     if (newTaskTitle.trim()) {
-      onAddTask({ title: newTaskTitle, description: "New task" });
+      onAddTask({ id: Date.now(), title: newTaskTitle, description: "New task" });
       setNewTaskTitle("");
     }
   };
@@ -26,15 +27,19 @@ export default function Column({
     }
   };
 
-  const cancelEditing = () => {
-    setNewColumnName(column.name);
-    setIsEditingName(false);
+  const handleDeleteTask = (taskId) => {
+    const updatedTasks = (column.tasks || []).filter((task) => task.id !== taskId);
+    console.log(updatedTasks); // Check the tasks array after deletion
+    onTaskUpdate(
+      column.id,
+      updatedTasks
+    );
   };
+  
 
   return (
     <div className="bg-gray-100 p-4 rounded shadow w-64">
       <div className="flex justify-between items-center mb-4">
-        {/* Column Name Editing */}
         {isEditingName ? (
           <div className="flex-grow flex items-center space-x-2">
             <input
@@ -51,7 +56,7 @@ export default function Column({
               Save
             </button>
             <button
-              onClick={cancelEditing}
+              onClick={() => setIsEditingName(false)}
               className="px-2 py-1 text-gray-600 bg-gray-200 rounded hover:bg-gray-300"
             >
               Cancel
@@ -61,37 +66,43 @@ export default function Column({
           <h2
             className="text-xl font-bold cursor-pointer truncate"
             onDoubleClick={() => setIsEditingName(true)}
-            title="Double-click to edit column name"
           >
             {column.name}
           </h2>
         )}
-
-        {/* Delete Column Button */}
         {!isEditingName && (
           <button
-            onClick={onDeleteColumn}
+            onClick={() => onDeleteColumn(column.id)}
             className="ml-2 text-red-500 font-bold hover:text-red-700"
-            title="Delete Column"
           >
             X
           </button>
         )}
       </div>
 
-      {/* Tasks List */}
       <div>
-        {column.tasks.map((task) => (
-          <Task
-            key={task.id}
-            task={task}
-            onEdit={(updatedTask) => onTaskUpdate(updatedTask)}
-            onDelete={() => onTaskUpdate({ ...task, deleted: true })}
-          />
-        ))}
+      {Array.isArray(column.tasks) ? (
+  column.tasks.map((task) => (
+    <Task
+      key={task.id}
+      task={task}
+      onEdit={(updatedTask) =>
+        onTaskUpdate(
+          column.id,
+          (column.tasks || []).map((t) =>
+            t.id === updatedTask.id ? updatedTask : t
+          )
+        )
+      }
+      onDelete={(taskId) => handleDeleteTask(taskId)}
+    />
+  ))
+) : (
+  <p>No tasks available</p>
+)}
+
       </div>
 
-      {/* Add Task Section */}
       <div className="mt-4">
         <input
           type="text"

@@ -10,7 +10,9 @@ export default function Board() {
   const handleAddTask = (columnId, task) => {
     setColumns((prevColumns) =>
       prevColumns.map((col) =>
-        col.id === columnId ? { ...col, tasks: [...col.tasks, task] } : col
+        col.id === columnId
+          ? { ...col, tasks: [...(col.tasks || []), task] }
+          : col
       )
     );
   };
@@ -20,6 +22,7 @@ export default function Board() {
       prevColumns.filter((col) => col.id !== columnId)
     );
   };
+  
 
   const handleRenameColumn = (columnId, newName) => {
     setColumns((prevColumns) =>
@@ -29,16 +32,19 @@ export default function Board() {
     );
   };
 
-  const handleTaskUpdate = (columnId, updatedTask) => {
+  const handleTaskUpdate = (columnId, updatedTasks) => {
+    setColumns((prevColumns) =>
+      prevColumns.map((col) =>
+        col.id === columnId ? { ...col, tasks: updatedTasks || [] } : col
+      )
+    );
+  };
+
+  const handleDeleteTask = (columnId, taskId) => {
     setColumns((prevColumns) =>
       prevColumns.map((col) =>
         col.id === columnId
-          ? {
-              ...col,
-              tasks: col.tasks.map((task) =>
-                task.id === updatedTask.id ? updatedTask : task
-              ),
-            }
+          ? { ...col, tasks: col.tasks.filter((task) => task.id !== taskId) }
           : col
       )
     );
@@ -46,7 +52,6 @@ export default function Board() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Logout Button */}
       <button
         onClick={() => alert("Logging out...")}
         className="absolute top-4 right-4 px-4 py-2 bg-red-500 text-white rounded-full"
@@ -54,7 +59,6 @@ export default function Board() {
         Logout
       </button>
 
-      {/* Centered Columns */}
       <div className="flex justify-center space-x-4 p-4">
         {columns.map((column) => (
           <Column
@@ -62,8 +66,11 @@ export default function Board() {
             column={column}
             onAddTask={(task) => handleAddTask(column.id, task)}
             onDeleteColumn={() => handleDeleteColumn(column.id)}
-            onTaskUpdate={(updatedTask) => handleTaskUpdate(column.id, updatedTask)}
-            onRenameColumn={handleRenameColumn} // Pass the rename callback
+            onTaskUpdate={(updatedTasks) =>
+              handleTaskUpdate(column.id, updatedTasks)
+            }
+            onRenameColumn={handleRenameColumn}
+            onDelete={(taskId) => handleDeleteTask(column.id, taskId)}
           />
         ))}
       </div>

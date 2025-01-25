@@ -4,6 +4,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Board from "./components/Board"
 import Home from "./components/Home"
+import KanbanBoard from "./components/KanbanBoard";
 
 export default function App() {
 
@@ -17,11 +18,11 @@ export default function App() {
 
   return (
     <Router>
-      <div className="App">
+      <div className="bg-gray-100">
         <Routes>
           <Route
             path="/"
-            element={user ? <Board user={user} /> : <Navigate to="/login" />}
+            element={user ? <KanbanBoard user={user} /> : <Navigate to="/login" />}
           />
           
 

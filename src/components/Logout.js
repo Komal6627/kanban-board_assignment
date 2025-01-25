@@ -23,10 +23,12 @@ const Logout = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div 
+    // className="flex justify-center items-center h-screen"
+    >
       <button
         onClick={handleLogout}
-        className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition"
+        // className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition"
       >
         Logout
       </button>

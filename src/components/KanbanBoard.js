@@ -10,7 +10,7 @@ const KanbanBoard = () => {
     { id: 2, name: "Bob" },
     { id: 3, name: "Sunny" },
     { id: 4, name: "Nitin" },
-    { id: 3, name: "Komal" },
+    { id: 5, name: "Komal" },
   ];
 
   // Add a new column
@@ -22,6 +22,32 @@ const KanbanBoard = () => {
     }
   };
 
+  // Rename a column
+  const renameColumn = (oldName) => {
+    const newName = prompt(`Rename column "${oldName}" to:`);
+    if (!newName || columns.includes(newName)) {
+      alert("Invalid or duplicate column name.");
+      return;
+    }
+
+    setColumns(columns.map((col) => (col === oldName ? newName : col)));
+    setTasks((prevTasks) => {
+      const updatedTasks = { ...prevTasks, [newName]: prevTasks[oldName] };
+      delete updatedTasks[oldName];
+      return updatedTasks;
+    });
+  };
+
+  // Remove a column
+  const removeColumn = (column) => {
+    if (window.confirm(`Are you sure you want to remove column "${column}"?`)) {
+      setColumns(columns.filter((col) => col !== column));
+      const newTasks = { ...tasks };
+      delete newTasks[column];
+      setTasks(newTasks);
+    }
+  };
+
   // Add a task to a column
   const addTask = (column) => {
     const taskTitle = prompt("Enter task title:");
@@ -29,9 +55,7 @@ const KanbanBoard = () => {
 
     const taskDescription = prompt("Enter task description:");
     const userId = prompt(
-      `Assign to user: Enter user ID (e.g., ${mockUsers.map((u) => u.id).join(
-        ", "
-      )}):`
+      `Assign to user: Enter user ID (e.g., ${mockUsers.map((u) => u.id).join(", ")}):`
     );
     const assignedUser = mockUsers.find((user) => user.id === Number(userId));
 
@@ -68,9 +92,7 @@ const KanbanBoard = () => {
     );
 
     const userId = prompt(
-      `Reassign user: Enter user ID (e.g., ${mockUsers.map((u) => u.id).join(
-        ", "
-      )}):`,
+      `Reassign user: Enter user ID (e.g., ${mockUsers.map((u) => u.id).join(", ")}):`,
       taskToEdit.assignedTo?.id || ""
     );
     const assignedUser = mockUsers.find((user) => user.id === Number(userId));
@@ -97,16 +119,6 @@ const KanbanBoard = () => {
         ...tasks,
         [column]: tasks[column].filter((task) => task.id !== taskId),
       });
-    }
-  };
-
-  // Remove a column
-  const removeColumn = (column) => {
-    if (window.confirm(`Are you sure you want to remove column "${column}"?`)) {
-      setColumns(columns.filter((col) => col !== column));
-      const newTasks = { ...tasks };
-      delete newTasks[column];
-      setTasks(newTasks);
     }
   };
 
@@ -151,6 +163,20 @@ const KanbanBoard = () => {
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">{column}</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => renameColumn(column)}
+                  className="text-yellow-500 hover:text-yellow-600"
+                >
+                  Rename
+                </button>
+                <button
+                  onClick={() => removeColumn(column)}
+                  className="text-red-500 hover:text-red-600"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
 
             <button

@@ -9,7 +9,7 @@ export default function App() {
 
   const [user, setUser] = useState(null); // Store the logged-in user's data
 
-  console.log(1,process.env.REACT_APP_API_KEY)
+ 
 
   const handleAuthChange = (authUser) => {
     setUser(authUser); 
@@ -40,4 +40,7 @@ export default function App() {
     </Router>
   );
 }
+
+
+
 

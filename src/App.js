@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Register from "./components/Register";
 import Login from "./components/Login";
-import Board from "./components/Board"
-import Home from "./components/Home"
+
 import KanbanBoard from "./components/KanbanBoard";
 
 export default function App() {

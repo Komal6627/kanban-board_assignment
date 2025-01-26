@@ -5,6 +5,13 @@ const KanbanBoard = () => {
   const [columns, setColumns] = useState([]);
   const [newColumn, setNewColumn] = useState("");
   const [tasks, setTasks] = useState({});
+  const mockUsers = [
+    { id: 1, name: "Alice" },
+    { id: 2, name: "Bob" },
+    { id: 3, name: "Sunny" },
+    { id: 4, name: "Nitin" },
+    { id: 3, name: "Komal" },
+  ];
 
   // Add a new column
   const addColumn = () => {
@@ -18,9 +25,21 @@ const KanbanBoard = () => {
   // Add a task to a column
   const addTask = (column) => {
     const taskTitle = prompt("Enter task title:");
-    if (!taskTitle) return; // Exit if title is not provided
+    if (!taskTitle) return;
 
     const taskDescription = prompt("Enter task description:");
+    const userId = prompt(
+      `Assign to user: Enter user ID (e.g., ${mockUsers.map((u) => u.id).join(
+        ", "
+      )}):`
+    );
+    const assignedUser = mockUsers.find((user) => user.id === Number(userId));
+
+    if (!assignedUser) {
+      alert("Invalid user ID. Task not assigned to a user.");
+      return;
+    }
+
     setTasks({
       ...tasks,
       [column]: [
@@ -29,6 +48,7 @@ const KanbanBoard = () => {
           id: Date.now(),
           title: taskTitle,
           description: taskDescription || "No description provided",
+          assignedTo: assignedUser,
         },
       ],
     });
@@ -40,18 +60,31 @@ const KanbanBoard = () => {
     if (!taskToEdit) return;
 
     const updatedTitle = prompt("Update task title:", taskToEdit.title);
-    if (!updatedTitle) return; // Exit if no new title is provided
+    if (!updatedTitle) return;
 
     const updatedDescription = prompt(
       "Update task description:",
       taskToEdit.description
     );
 
+    const userId = prompt(
+      `Reassign user: Enter user ID (e.g., ${mockUsers.map((u) => u.id).join(
+        ", "
+      )}):`,
+      taskToEdit.assignedTo?.id || ""
+    );
+    const assignedUser = mockUsers.find((user) => user.id === Number(userId));
+
+    if (!assignedUser) {
+      alert("Invalid user ID. Task not reassigned to a user.");
+      return;
+    }
+
     setTasks({
       ...tasks,
       [column]: tasks[column].map((task) =>
         task.id === taskId
-          ? { ...task, title: updatedTitle, description: updatedDescription }
+          ? { ...task, title: updatedTitle, description: updatedDescription, assignedTo: assignedUser }
           : task
       ),
     });
@@ -77,26 +110,14 @@ const KanbanBoard = () => {
     }
   };
 
-  // Rename a column
-  const renameColumn = (column) => {
-    const newName = prompt("Enter new column name:", column);
-    if (newName) {
-      setColumns(columns.map((col) => (col === column ? newName : col)));
-      const newTasks = { ...tasks };
-      newTasks[newName] = newTasks[column];
-      delete newTasks[column];
-      setTasks(newTasks);
-    }
-  };
-
   return (
-    <div className="relative min-h-screen ">
+    <div className="relative min-h-screen">
       {/* Logout Button */}
       <button
         onClick={() => alert("Logging out...")}
         className="absolute top-4 right-4 px-4 py-2 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600"
       >
-        <Logout/>
+        <Logout />
       </button>
 
       {/* Heading */}
@@ -121,33 +142,17 @@ const KanbanBoard = () => {
         </button>
       </div>
 
-      {/* Centered Columns */}
+      {/* Columns */}
       <div className="flex justify-center space-x-6 px-4">
         {columns.map((column) => (
           <div
             key={column}
             className="w-64 p-4 bg-white border border-gray-300 rounded-lg shadow-md"
           >
-            {/* Column Header */}
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">{column}</h3>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => renameColumn(column)}
-                  className="text-blue-500 hover:text-blue-600"
-                >
-                  Rename
-                </button>
-                <button
-                  onClick={() => removeColumn(column)}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  Remove
-                </button>
-              </div>
             </div>
 
-            {/* Add Task Button */}
             <button
               onClick={() => addTask(column)}
               className="w-full mb-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
@@ -164,6 +169,9 @@ const KanbanBoard = () => {
                 >
                   <h4 className="font-semibold">{task.title}</h4>
                   <p className="text-sm text-gray-600">{task.description}</p>
+                  <p className="text-sm font-medium text-blue-500">
+                    Assigned to: {task.assignedTo?.name || "Unassigned"}
+                  </p>
                   <div className="flex justify-end space-x-2 mt-2">
                     <button
                       onClick={() => editTask(column, task.id)}
